@@ -24,6 +24,7 @@ def capture():
     print("Capture button pressed !! Capturing image !")
     camera_config = picam2.create_still_configuration(main={"size": (1920, 1080)}, lores={"size": (1280, 720)}, display="lores")
     picam2.configure(camera_config)
+    picam2.set_controls({"AfMode": 2 ,"AfTrigger": 0})  # Continous Autofocus Added
     timestamp = datetime.now().isoformat()
     picam2.start()
     time.sleep(2) 
@@ -36,6 +37,7 @@ def record():
     print("Record button pressed !! Starting video record !")
     video_config = picam2.create_video_configuration()
     picam2.configure(video_config)
+    picam2.set_controls({"AfMode": 2 ,"AfTrigger": 0}) # Continous Autofocus Added
     timestp = datetime.now().isoformat()
     encoder = H264Encoder(10000000)
     picam2.start_recording(encoder, '/home/pi/data/%s.h264' % timestp)
