@@ -9,15 +9,17 @@ In a landscape marked by diverse learning requirements, Trinetra endeavors to re
 
 With its innovative approach, Trinetra seeks to empower learners across all spectrums, facilitating a seamless journey towards intellectual growth and development. Welcome to a realm where learning knows no bounds, and Trinetra illuminates the path to enlightenment.
 
-### Product Features :
+### Product Features : 
+Trinetra leverages advanced Google Cloud technologies to provide a tailored, efficient, and inclusive educational platform. Here are the key features of our product, enhanced by Google's powerful services:
 
-**(A) Personalized Learning:** Trinetra offers tailored learning experiences that adapt to individual paces and preferences, ensuring optimal comprehension and retention.
-Content Creation: Our platform provides streamlined tools designed specifically for bloggers, enabling efficient article writing and content generation processes, thereby enhancing productivity and creativity.
+**(A) Personalized Learning:** 
+Trinetra offers personalized learning experiences that adapt to individual learning paces and preferences, ensuring optimal comprehension and retention. This is made possible by integrating **Vertex AI Multimodal API**, which allows our platform to understand and process various forms of data, adapting content dynamically to meet user needs. This integration supports sophisticated content creation tools designed specifically for bloggers, enabling them to write articles and generate content more efficiently, thereby enhancing productivity and creativity.
 
-**(B) Data Collection:** Trinetra simplifies the process of capturing and transcribing information for research purposes, facilitating seamless data collection and analysis, ultimately leading to deeper insights and informed decision-making.
+**(B) Data Collection:** 
+Our platform simplifies the process of capturing and transcribing information, which is crucial for research purposes. By incorporating **Google's Speech-to-Text API powered by the Chirp model**, Trinetra facilitates seamless audio to text conversion, enhancing data collection and analysis. This leads to deeper insights and more informed decision-making, supported further by **AlloyDB**, which provides a scalable and highly available database service optimized for advanced data analysis.
 
-**(C) Accessibility:** With features such as text-to-speech and image description capabilities, Trinetra caters to the needs of visually impaired individuals, empowering them to access and engage with content effortlessly, thus promoting inclusivity and equal opportunities for learning.
-Trinetra is committed to providing a comprehensive and user-centric solution that addresses diverse learning needs while fostering accessibility, efficiency, and innovation.
+**(C) Accessibility:** 
+Trinetra is committed to inclusivity and equal opportunities for learning. Features such as text-to-speech and image description capabilities are significantly enhanced by Google's APIs. **Google's Text-to-Speech API** converts text into natural-sounding speech, allowing visually impaired users to listen to the content easily. Furthermore, the integration of image recognition technologies through Google's APIs enables descriptions of visual content, making our platform more accessible to users with visual impairments.
 
 ### Potential Applications : 
 
