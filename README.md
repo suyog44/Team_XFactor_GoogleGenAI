@@ -4,12 +4,6 @@
 
 Welcome to Trinetra, your gateway to personalized learning experiences powered by Gemini AI. Trinetra is a cutting-edge solution designed to cater to diverse learning needs, offering tailored tools and features to enhance understanding and productivity.
 
-### Team Members :
-
-1. Suyog Buradkar
-2. XYZ
-3. XYZ
-
 ### Challenge Description : 
 In a landscape marked by diverse learning requirements, Trinetra endeavors to redefine the acquisition of knowledge. It aspires to transform the educational paradigm, catering to individuals of varying learning speeds, including those engaged in content creation, research endeavors, or facing challenges associated with visual impairments. Trinetra stands as a beacon of support, fostering inclusivity and accessibility in the pursuit of enlightenment. 
 
