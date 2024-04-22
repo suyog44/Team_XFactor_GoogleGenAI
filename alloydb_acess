@@ -1,0 +1,65 @@
+
+import requests
+import json
+import base64
+
+def encode_image_to_base64(image_path):
+    # Read the image file in binary mode
+    with open(image_path, "rb") as image_file:
+        # Encode the binary data to base64
+        encoded_string = base64.b64encode(image_file.read())
+        # Optionally decode to a string if needed for JSON or other purposes
+        encoded_string = encoded_string.decode('utf-8')
+        return encoded_string
+
+
+url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/alloydb_connect'
+headers = {'Content-Type': 'application/json'}
+
+# Create a table
+
+TableName = "memories"
+sql_text = '(session_id VARCHAR , image_data TEXT ,image_description TEXT)' # column names and type
+
+payload = json.dumps({"action_call": ['CREATE_TABLE', {'TABLE_NAME':'' , 'sql_text':sql_text }]})
+print(payload)
+
+response = requests.post(url, data=payload, headers=headers)
+print(response.text)
+
+# Add information to table
+
+## inputs 
+text_input = "My name is out"
+image_path = "/content/1.jpeg"
+session_id = "Random_session_id"
+encoded_image = encode_image_to_base64(image_path)
+
+parameter_map = [{'session_id': session_id , 'image_data':encoded_image,'image_description': text_input }]
+
+payload = json.dumps({"action_call": ['UPDATE_TABLE', {'TABLE_NAME':'memories' , 'sql_text':'(:session_id, :image_data,:image_description )' , 'parameter_map': parameter_map }]})
+print(payload)
+
+response = requests.post(url, data=payload, headers=headers)
+print(response.text)
+
+
+# Reindex the Table 
+payload = json.dumps({"action_call": ['RECALCULATE_THE_INDEX', {'TABLE_NAME':'memories' }]})
+print(payload)
+
+response = requests.post(url, data=payload, headers=headers)
+print(response.text)
+
+# Retrieve from the table based on embeding
+
+query = " what is name of brand?"
+row_count = 10
+
+parameter_map = [{'session_id': "vvuvvjhb" , 'image_data':encoded_image,'image_description': text_input }]
+
+payload = json.dumps({"action_call": ['RETRIEVE_FROM_TABLE_EMBEDDING', {'TABLE_NAME':'memories' , 'sel_columns':'session_id, image_data,image_description' , 'query': query ,'row_count' : row_count  }]})
+print(payload)
+
+response = requests.post(url, data=payload, headers=headers)
+print(response.text)
