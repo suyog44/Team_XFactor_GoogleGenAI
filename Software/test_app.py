@@ -157,7 +157,7 @@ while True:
             data = db_access.retrieve_from_table("memories", text_input, 2 , 'image_description')
             print("Data : " , data)
             query = data + "   " +text_input
-            response = vertexai_.send_query([text_input], [])  # Call LLM with transcribed text
+            response = vertexai_.send_query([query], [])  # Call LLM with transcribed text
             print(response)
 
     # if image_captured:
