@@ -141,6 +141,7 @@ while True:
         # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
         if text_input:
-            vertexai_.send_query([text_input], [image_path])  # Call LLM with transcribed text
+            response = vertexai_.send_query([text_input], [image_path])  # Call LLM with transcribed text
+            print(response)
 
     time.sleep(0.1) # Adjust delay as needed
