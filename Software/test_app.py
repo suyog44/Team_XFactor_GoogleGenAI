@@ -18,25 +18,27 @@ import requests
 import json
 import base64
 
+from vertexai.vertexai_access import VertexaiAccess
+
 # LLM Function
-def encode_image_to_base64(image_path):
-    with open(image_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
-        encoded_string = encoded_string.decode('utf-8')
-    return encoded_string
+# def encode_image_to_base64(image_path):
+#     with open(image_path, "rb") as image_file:
+#         encoded_string = base64.b64encode(image_file.read())
+#         encoded_string = encoded_string.decode('utf-8')
+#     return encoded_string
 
-def call_llm_api(text_input, image_path=None):
-    if image_path:
-        encoded_image = encode_image_to_base64(image_path)
-        payload = json.dumps({"text_input": text_input, "image_input": [encoded_image]})
-    else:
-        payload = json.dumps({"text_input": text_input})
+# def call_llm_api(text_input, image_path=None):
+#     if image_path:
+#         encoded_image = encode_image_to_base64(image_path)
+#         payload = json.dumps({"text_input": text_input, "image_input": [encoded_image]})
+#     else:
+#         payload = json.dumps({"text_input": text_input})
 
-    url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
-    headers = {'Content-Type': 'application/json'}
+#     url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
+#     headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(url, data=payload, headers=headers)
-    print(response.text)
+#     response = requests.post(url, data=payload, headers=headers)
+#     print(response.text)
 
 # Speech-to-Text and Audio Recording Functions
 def transcribe_audio(audio_file_path):
@@ -100,6 +102,11 @@ camera_config = picam2.create_still_configuration(main={"size": (1920, 1080)}, l
 picam2.configure(camera_config)
 picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
 
+# Vertex apis intialization 
+url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
+vertexai_ = VertexaiAccess(url)
+
+
 # Function to capture image with unique ID
 def capture_image(image_path):
     picam2.start()
@@ -124,7 +131,7 @@ while True:
         #call_llm_api(["Analyze this image"], image_path)
     elif mpr121[1].value:
         #record_video()
-	    print("Video Recording is not available")
+        print("Video Recording is not available")
     elif mpr121[2].value:
         # Record audio temporarily
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as audio_file:
@@ -134,6 +141,6 @@ while True:
         # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
         if text_input:
-            call_llm_api([text_input], image_path)  # Call LLM with transcribed text
+            vertexai_.send_query([text_input], [image_path])  # Call LLM with transcribed text
 
     time.sleep(0.1) # Adjust delay as needed
