@@ -105,9 +105,10 @@ picam2.configure(camera_config)
 picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
 
 # Vertex apis intialization 
-url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
-vertexai_ = VertexaiAccess(url)
-db_access = AlloydbAccess(url)
+vertexai_url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
+alloydb_url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/alloydb_connect'
+vertexai_ = VertexaiAccess(vertexai_url)
+db_access = AlloydbAccess(alloydb_url)
 
 image_captured = False
 
