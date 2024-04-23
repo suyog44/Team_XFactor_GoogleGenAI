@@ -49,7 +49,7 @@ class AlloydbAccess:
         response = requests.post(self.url, data=payload, headers=self.headers)
         return response.text
 
-    def retrieve_from_table(self, table_name, query, row_count):
+    def retrieve_from_table(self, table_name, query, row_count , sel_columns):
         """
         Retrieves rows from the table based on an embedding query.
 
@@ -57,8 +57,9 @@ class AlloydbAccess:
         table_name (str): Name of the table to retrieve data from.
         query (str): Query to match against embeddings.
         row_count (int): Maximum number of rows to retrieve.
+        sel_columns (str): columns you want your data from . eg. 'session_id, image_data, image_description'
         """
-        payload = json.dumps({"action_call": ['RETRIEVE_FROM_TABLE_EMBEDDING', {'TABLE_NAME': table_name, 'sel_columns': 'session_id, image_data, image_description', 'query': query, 'row_count': row_count}]})
+        payload = json.dumps({"action_call": ['RETRIEVE_FROM_TABLE_EMBEDDING', {'TABLE_NAME': table_name, 'sel_columns': sel_columns, 'query': query, 'row_count': row_count}]})
         response = requests.post(self.url, data=payload, headers=self.headers)
         return response.text
 
