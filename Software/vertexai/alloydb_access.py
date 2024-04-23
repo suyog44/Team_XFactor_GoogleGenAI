@@ -62,7 +62,7 @@ class AlloydbAccess:
         payload = json.dumps({"action_call": ['RETRIEVE_FROM_TABLE_EMBEDDING', {'TABLE_NAME': table_name, 'sel_columns': sel_columns, 'query': query, 'row_count': row_count}]})
         response = requests.post(self.url, data=payload, headers=self.headers)
 
-        data_list= response.text.split("\n")
+        data_list= response.text.split(" __splitKey__ ")
         final_response = f"".join(data_list[::2])
 
         return final_response
