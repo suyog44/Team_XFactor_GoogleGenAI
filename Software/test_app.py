@@ -110,6 +110,9 @@ alloydb_url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/alloy
 vertexai_ = VertexaiAccess(vertexai_url)
 db_access = AlloydbAccess(alloydb_url)
 
+TABLE_Name = "late_night_tests"
+print(db_access.create_table(TABLE_Name , '(session_id VARCHAR , image_data TEXT ,image_description TEXT)'))
+
 image_captured = False
 
 # Function to capture image with unique ID
@@ -138,8 +141,8 @@ while True:
         encoded_image = db_access.encode_image_to_base64(image_path)
         response = vertexai_.send_query(["What is this image about?"], [image_path])
         print(response)
-        print(db_access.update_table("memories", "122312121", encoded_image, response))
-        print(db_access.reindex_table("memories"))
+        print(db_access.update_table(TABLE_Name, "122312121", encoded_image, response))
+        print(db_access.reindex_table(TABLE_Name))
         #call_llm_api(["Analyze this image"], image_path)
 
     elif mpr121[1].value:
@@ -154,7 +157,7 @@ while True:
         # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
         if text_input:
-            data = db_access.retrieve_from_table("memories", text_input, 2 , 'image_description')
+            data = db_access.retrieve_from_table(TABLE_Name, text_input, 2 , 'image_description')
             print("Data : " , data)
             query = data + "   " +text_input
             response = vertexai_.send_query([query], [])  # Call LLM with transcribed text
@@ -165,8 +168,8 @@ while True:
     #     encoded_image = db_access.encode_image_to_base64(image_path)
     #     response = vertexai_.send_query(["What is this image about?"], [image_path])
     #     print(response)
-    #     print(db_access.update_table("memories", "122312121", encoded_image, response))
-    #     print(db_access.reindex_table("memories"))
+    #     print(db_access.update_table(TABLE_Name, "122312121", encoded_image, response))
+    #     print(db_access.reindex_table(TABLE_Name))
     #     image_captured = False
 
     time.sleep(0.1) # Adjust delay as needed

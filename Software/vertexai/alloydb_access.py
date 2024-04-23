@@ -82,8 +82,8 @@ class AlloydbAccess:
 # Example usage
 if __name__ == "__main__":
     db_access = AlloydbAccess('https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/alloydb_connect')
-    print(db_access.create_table("memories", "(session_id VARCHAR, image_data TEXT, image_description TEXT)"))
+    print(db_access.create_table(TABLE_Name, "(session_id VARCHAR, image_data TEXT, image_description TEXT)"))
     encoded_image = db_access.encode_image_to_base64("/content/1.jpeg")
-    print(db_access.update_table("memories", "Random_session_id", encoded_image, "My name is out"))
-    print(db_access.reindex_table("memories"))
-    print(db_access.retrieve_from_table("memories", "what is name of brand?", 10))
+    print(db_access.update_table(TABLE_Name, "Random_session_id", encoded_image, "My name is out"))
+    print(db_access.reindex_table(TABLE_Name))
+    print(db_access.retrieve_from_table(TABLE_Name, "what is name of brand?", 10))
