@@ -119,6 +119,7 @@ def capture_image(image_path):
     print(f"Image captured and saved at: {image_path}")
     image_captured = True
 
+
 # Function to record video for 10 seconds
 def record_video():
     video_path = f"/content/video_{int(time.time())}.h264"
@@ -134,6 +135,11 @@ while True:
         image_id = int(time.time())
         image_path = f"/content/Image_{image_id}.jpg"
         capture_image(image_path)
+        encoded_image = db_access.encode_image_to_base64(image_path)
+        response = vertexai_.send_query(["What is this image about?"], [image_path])
+        print(response)
+        print(db_access.update_table("memories", "122312121", encoded_image, response))
+        print(db_access.reindex_table("memories"))
         #call_llm_api(["Analyze this image"], image_path)
 
     elif mpr121[1].value:
@@ -148,14 +154,19 @@ while True:
         # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
         if text_input:
-            response = vertexai_.send_query([text_input], [image_path])  # Call LLM with transcribed text
+            data = db_access.retrieve_from_table("memories", text_input, 2 , 'image_description')
+            print("Data : " , data)
+            query = data + "   " +text_input
+            response = vertexai_.send_query([text_input], [])  # Call LLM with transcribed text
             print(response)
 
-    if image_captured:
-        encoded_image = db_access.encode_image_to_base64(image_path)
-        response = vertexai_.send_query(["What is this image about?"], [image_path])
-        print(db_access.update_table("memories", "122312121", encoded_image, response))
-        print(db_access.reindex_table("memories"))
-        image_captured = False
+    # if image_captured:
+    #     print("")
+    #     encoded_image = db_access.encode_image_to_base64(image_path)
+    #     response = vertexai_.send_query(["What is this image about?"], [image_path])
+    #     print(response)
+    #     print(db_access.update_table("memories", "122312121", encoded_image, response))
+    #     print(db_access.reindex_table("memories"))
+    #     image_captured = False
 
     time.sleep(0.1) # Adjust delay as needed
