@@ -111,7 +111,7 @@ vertexai_ = VertexaiAccess(vertexai_url)
 db_access = AlloydbAccess(alloydb_url)
 
 TABLE_Name = "late_night_tests"
-print(db_access.create_table(TABLE_Name , '(session_id VARCHAR , image_data TEXT ,image_description TEXT)'))
+# print(db_access.create_table(TABLE_Name , '(session_id VARCHAR , image_data TEXT ,image_description TEXT)'))
 
 image_captured = False
 
