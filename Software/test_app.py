@@ -19,6 +19,8 @@ import json
 import base64
 
 from vertexai.vertexai_access import VertexaiAccess
+from vertexai.alloydb_access import AlloydbAccess
+
 
 # LLM Function
 # def encode_image_to_base64(image_path):
@@ -105,13 +107,16 @@ picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
 # Vertex apis intialization 
 url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
 vertexai_ = VertexaiAccess(url)
+db_access = AlloydbAccess(url)
 
+image_captured = False
 
 # Function to capture image with unique ID
 def capture_image(image_path):
     picam2.start()
     picam2.capture_file(image_path)
     print(f"Image captured and saved at: {image_path}")
+    image_captured = True
 
 # Function to record video for 10 seconds
 def record_video():
@@ -129,6 +134,7 @@ while True:
         image_path = f"/content/Image_{image_id}.jpg"
         capture_image(image_path)
         #call_llm_api(["Analyze this image"], image_path)
+
     elif mpr121[1].value:
         #record_video()
         print("Video Recording is not available")
@@ -143,5 +149,12 @@ while True:
         if text_input:
             response = vertexai_.send_query([text_input], [image_path])  # Call LLM with transcribed text
             print(response)
+
+    if image_captured:
+        encoded_image = db_access.encode_image_to_base64(image_path)
+        response = vertexai_.send_query(["What is this image about?"], [image_path])
+        print(db_access.update_table("memories", "122312121", encoded_image, response))
+        print(db_access.reindex_table("memories"))
+        image_captured = False
 
     time.sleep(0.1) # Adjust delay as needed
