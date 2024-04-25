@@ -171,8 +171,8 @@ while True:
         response = vertexai_.send_query(["What is this image about?"], [image_path])
         print(response)
         embeds = vertexai_.generate_embeddings([response], task='RETRIEVAL_DOCUMENT')
-        print(db_access.update_table(TABLE_Name, "122312121", encoded_image, response , embeds[0]))
-        print(db_access.reindex_table(TABLE_Name))
+        print(db_access.update_table(TABLE_Name, session_id, encoded_image, response , embeds[0]))
+        # print(db_access.reindex_table(TABLE_Name))
         #call_llm_api(["Analyze this image"], image_path)
 
     elif mpr121[1].value:
