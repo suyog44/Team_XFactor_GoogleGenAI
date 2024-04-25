@@ -44,9 +44,48 @@ class VertexaiAccess:
         str: The response text from the Vertex AI service.
         """
         image_input = [self.encode_image_to_base64(image_path) for image_path in image_paths]
-        payload = json.dumps({"text_input": text_input, "image_input": image_input})
+        payload = json.dumps({"action_call" :"generate_reponse","text_input": text_input, "image_input": image_input})
         response = requests.post(self.url, data=payload, headers=self.headers)
         return response.text
+    
+    def generate_embeddings(self,texts, task='RETRIEVAL_DOCUMENT'):
+        """
+        Send a list of texts to a remote server to generate embeddings for a specified task.
+        
+        Args:
+            texts (list of str): The list of text documents for which embeddings are to be generated.
+            task (str): The task type for which the embeddings are generated. Default is 'RETRIEVAL_DOCUMENT'.
+        
+        Returns:
+            dict: A dictionary containing the server's response.
+            
+        Raises:
+            requests.exceptions.RequestException: If the request fails for any connectivity issues.
+            Exception: If any other unforeseen error occurs during request handling.
+        """
+        # Define the payload as a JSON string
+        payload = json.dumps({
+            "action_call": "generate_embeddings",
+            "texts": texts,
+            "task": task
+        })
+
+
+        # Send the request and catch exceptions related to connection issues
+        try:
+            response = requests.post(self.url, data=payload, headers=self.headers)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+            raise
+        
+        # Load and return the JSON response
+        try:
+            out = json.loads(response.text)
+            return out
+        except json.JSONDecodeError:
+            raise Exception("Failed to decode the response from the server.")
+
 
 # Example usage
 if __name__ == "__main__":

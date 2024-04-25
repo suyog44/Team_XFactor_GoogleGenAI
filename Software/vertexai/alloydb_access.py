@@ -23,7 +23,7 @@ class AlloydbAccess:
         response = requests.post(self.url, data=payload, headers=self.headers)
         return response.text
 
-    def update_table(self, table_name, session_id, image_data, image_description):
+    def update_table(self, table_name, session_id, image_data, image_description , embeds = None):
         """
         Adds information to a specified table.
 
@@ -33,8 +33,8 @@ class AlloydbAccess:
         image_data (str): Base64 encoded image data.
         image_description (str): Description of the image.
         """
-        parameter_map = [{'session_id': session_id, 'image_data': image_data, 'image_description': image_description}]
-        payload = json.dumps({"action_call": ['UPDATE_TABLE', {'TABLE_NAME': table_name, 'sql_text': '(:session_id, :image_data, :image_description)', 'parameter_map': parameter_map}]})
+        parameter_map = [{'session_id': session_id, 'image_data': image_data, 'image_description': image_description , 'embedding' : json.dumps(embeds)}]
+        payload = json.dumps({"action_call": ['UPDATE_TABLE', {'TABLE_NAME': table_name, 'sql_text': '(:session_id, :image_data, :image_description , :embedding)', 'parameter_map': parameter_map}]})
         response = requests.post(self.url, data=payload, headers=self.headers)
         return response.text
 
@@ -66,6 +66,46 @@ class AlloydbAccess:
         final_response = f"".join(data_list[::2])
 
         return final_response
+    
+        
+    def retrieve_session_data(self,session_id):
+        """
+        Sends a request to retrieve specific columns from a table in a database based on a session ID.
+        
+        Args:
+            session_id (str): The session ID to filter the data retrieval.
+        
+        Returns:
+            str: The response text from the server, which includes the retrieved data.
+            
+        Raises:
+            requests.exceptions.RequestException: If the request fails due to connectivity issues or server errors.
+            Exception: If any other unforeseen error occurs during request handling.
+        """
+        # Create the payload with the session_id and other parameters
+        payload = json.dumps({
+            "action_call": [
+                'RETRIEVE_FROM_TABLE_SESSION',
+                {
+                    'TABLE_NAME': 'late_night_tests',
+                    'sel_columns': 'image_data, image_description, embedding',
+                    'sel_session': session_id
+                }
+            ]
+        })
+        
+        
+        # Execute the POST request and handle potential exceptions
+        try:
+            response = requests.post(self.url, data=payload, headers=self.headers)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+            raise
+        
+        # Return the text of the response
+        return json.loads(response.text)
+
 
     @staticmethod
     def encode_image_to_base64(image_path):

@@ -21,6 +21,8 @@ import base64
 from vertexai.vertexai_access import VertexaiAccess
 from vertexai.alloydb_access import AlloydbAccess
 
+from annoy import AnnoyIndex
+
 
 # LLM Function
 # def encode_image_to_base64(image_path):
@@ -115,6 +117,11 @@ TABLE_Name = "late_night_tests"
 
 image_captured = False
 
+session_id = "seret"
+
+index = AnnoyIndex(768, 'angular')  # Using angular distance
+
+
 # Function to capture image with unique ID
 def capture_image(image_path):
     picam2.start()
@@ -131,6 +138,28 @@ def record_video():
     picam2.stop_recording()
     print(f"Video recorded and saved at: {video_path}")
 
+def prompt_creator(data , query):
+
+    prompt = """You are a friendly advisor helping to answer questions. Based on the search request we have loaded a list of documents closely related to the search.
+
+        The user asked:
+        <question>
+        {query}
+        </question>
+
+        Here is the list of matching documents:
+        <roles>
+        {data}
+        </roles>
+
+        You should answer the question using the matching documents, reply with supplemental information.
+        Answer:
+        """
+    
+    return prompt
+    
+
+
 # Main loop
 while True:
     # Check for touched electrodes
@@ -141,7 +170,8 @@ while True:
         encoded_image = db_access.encode_image_to_base64(image_path)
         response = vertexai_.send_query(["What is this image about?"], [image_path])
         print(response)
-        print(db_access.update_table(TABLE_Name, "122312121", encoded_image, response))
+        embeds = vertexai_.generate_embeddings([response], task='RETRIEVAL_DOCUMENT')
+        print(db_access.update_table(TABLE_Name, "122312121", encoded_image, response , embeds[0]))
         print(db_access.reindex_table(TABLE_Name))
         #call_llm_api(["Analyze this image"], image_path)
 
@@ -156,12 +186,31 @@ while True:
 
         # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
+
+
         if text_input:
-            data = db_access.retrieve_from_table(TABLE_Name, text_input, 2 , 'image_description')
+
+            stored_data = db_access.retrieve_session_data(session_id)
+            embeds = stored_data["embedding"]
+
+            for i in range(len(embeds)):
+                index.add_item(i, embeds[i])
+            index.build(10)  # 10 trees 
+
+            query_embed = vertexai_.generate_embeddings([text_input], task='RETRIEVAL_QUERY')
+            data_index = index.get_nns_by_vector(query_embed[0], 2, include_distances=True)
+
+            data = "\n".join([stored_data["image_description"][index] for index in data_index[0] ])
+
+            # data = db_access.retrieve_from_table(TABLE_Name, text_input, 2 , 'image_description')
             print("Data : " , data)
-            query = data + "   " +text_input
-            response = vertexai_.send_query([query], [])  # Call LLM with transcribed text
+
+            prompt = prompt_creator(data , text_input)
+            response = vertexai_.send_query([prompt], [])  # Call LLM with transcribed text
             print(response)
+
+            # del index
+
 
     # if image_captured:
     #     print("")
