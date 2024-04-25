@@ -60,12 +60,12 @@ picam2.configure(camera_config)
 picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
 
 # Vertex APIs initialization 
-vertexai_url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
-alloydb_url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/alloydb_connect'
+vertexai_url = 'https://asia-south1-hackathon-genai-08032024.cloudfunctions.net/vertexai_gen'
+alloydb_url = 'https://asia-south1-hackathon-genai-08032024.cloudfunctions.net/alloydb_connect'
 vertexai_ = VertexaiAccess(vertexai_url)
 db_access = AlloydbAccess(alloydb_url)
 
-TABLE_NAME = "late_night_tests"
+TABLE_NAME = "learner_demo"
 
 image_captured = False
 
@@ -158,7 +158,7 @@ while True:
             for i in range(len(embeds)):
                 embed = json.loads(embeds[i])
                 index.add_item(i, embed)
-            index.build(10)  # 10 trees 
+            index.build(len(embeds) + 5)  # +5 trees 
 
             query_embed = vertexai_.generate_embeddings([text_input], task='RETRIEVAL_QUERY')
             data_index = index.get_nns_by_vector(query_embed[0], 2, include_distances=True)
