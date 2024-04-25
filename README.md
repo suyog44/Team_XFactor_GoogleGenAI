@@ -200,3 +200,4 @@ For any inquiries or assistance, feel free to reach out to us at [email@example.
 ### Contributors
 1. XYZ
 2. XYZ
+3. XYZ
