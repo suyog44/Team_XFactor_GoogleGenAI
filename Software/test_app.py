@@ -193,8 +193,12 @@ while True:
             stored_data = db_access.retrieve_session_data(session_id)
             embeds = stored_data["embedding"]
 
+            print(len(embeds))
+
             for i in range(len(embeds)):
-                index.add_item(i, embeds[i])
+                embed = json.loads(embeds[i])
+                print(len(embed))
+                index.add_item(i, embed)
             index.build(10)  # 10 trees 
 
             query_embed = vertexai_.generate_embeddings([text_input], task='RETRIEVAL_QUERY')
