@@ -213,6 +213,12 @@ while True:
             response = vertexai_.send_query([prompt], [])  # Call LLM with transcribed text
             print(response)
 
+            # Now, let's clear the Annoy index
+            index = AnnoyIndex(768, 'angular')  # Using angular distance
+
+
+ 
+
             # del index
 
 
