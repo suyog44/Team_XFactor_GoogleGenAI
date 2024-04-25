@@ -140,21 +140,7 @@ def record_video():
 
 def prompt_creator(data , query):
 
-    prompt = """You are a friendly advisor helping to answer questions. Based on the search request we have loaded a list of documents closely related to the search.
-
-        The user asked:
-        <question>
-        {query}
-        </question>
-
-        Here is the list of matching documents:
-        <roles>
-        {data}
-        </roles>
-
-        You should answer the question using the matching documents, reply with supplemental information.
-        Answer:
-        """
+    prompt = f"Based on the context delimited in backticks, answer the query. ```{data}``` {query}"
     
     return prompt
     
