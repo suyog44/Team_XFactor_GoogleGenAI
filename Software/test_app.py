@@ -117,7 +117,7 @@ TABLE_Name = "late_night_tests"
 
 image_captured = False
 
-session_id = "seret"
+session_id =  "122312121" #"seret"
 
 index = AnnoyIndex(768, 'angular')  # Using angular distance
 
