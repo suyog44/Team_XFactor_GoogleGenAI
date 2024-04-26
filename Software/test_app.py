@@ -165,8 +165,19 @@ while True:
 
             data = "\n".join([stored_data["image_description"][index] for index in data_index[0] ])
 
+            print("Data Retrieve ", data)
+
             prompt = f"Based on the context delimited in backticks, answer the query. ```{data}``` {text_input}"
             response = vertexai_.send_query([prompt], [])
+
+            print("----------------------------------------------------------------------------------")
+
+            print("----------------------------------------------------------------------------------")
+
+            print("Response is: ")
+
+            print(response)
+
 
             index = AnnoyIndex(768, 'angular')  # Using angular distance
 
