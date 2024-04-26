@@ -68,7 +68,7 @@ class AlloydbAccess:
         return final_response
     
         
-    def retrieve_session_data(self,session_id):
+    def retrieve_session_data(self,session_id , TABLE_NAME):
         """
         Sends a request to retrieve specific columns from a table in a database based on a session ID.
         
@@ -87,7 +87,7 @@ class AlloydbAccess:
             "action_call": [
                 'RETRIEVE_FROM_TABLE_SESSION',
                 {
-                    'TABLE_NAME': 'late_night_tests',
+                    'TABLE_NAME': TABLE_NAME,
                     'sel_columns': 'image_data, image_description, embedding',
                     'sel_session': session_id
                 }

@@ -152,7 +152,7 @@ while True:
         text_input = transcribe_audio(audio_file_path)
 
         if text_input:
-            stored_data = db_access.retrieve_session_data(session_id)
+            stored_data = db_access.retrieve_session_data(session_id , TABLE_NAME)
             embeds = stored_data["embedding"]
 
             for i in range(len(embeds)):
