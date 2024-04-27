@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
-FILE: Goggle Working Code V1.0
-DATE: 18th April 2024
+FILE: Goggle Working Code V1.3
+DATE: 26th April 2024
 
 """
 import time
@@ -18,29 +18,66 @@ import requests
 import json
 import base64
 
-# LLM Function
-def encode_image_to_base64(image_path):
-    with open(image_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
-        encoded_string = encoded_string.decode('utf-8')
-    return encoded_string
+from vertexai.vertexai_access import VertexaiAccess
+from vertexai.alloydb_access import AlloydbAccess
 
-def call_llm_api(text_input, image_path=None):
-    if image_path:
-        encoded_image = encode_image_to_base64(image_path)
-        payload = json.dumps({"text_input": text_input, "image_input": [encoded_image]})
-    else:
-        payload = json.dumps({"text_input": text_input})
+from annoy import AnnoyIndex
 
-    url = 'https://asia-south1-indigo-bazaar-420408.cloudfunctions.net/openvertex_tesrun'
-    headers = {'Content-Type': 'application/json'}
+SESSION_FILE_PATH = "/content/session.log"
 
-    response = requests.post(url, data=payload, headers=headers)
-    print(response.text)
+def get_last_session_id():
+    try:
+        with open(SESSION_FILE_PATH, "r") as file:
+            last_session_id = file.read().strip()
+        return last_session_id
+    except FileNotFoundError:
+        return None
 
-# Speech-to-Text and Audio Recording Functions
+def save_session_id(session_id):
+    with open(SESSION_FILE_PATH, "w") as file:
+        file.write(session_id)
+
+def increment_session_id(session_id):
+    session_number = int(session_id.split("#")[1])
+    next_session_number = session_number + 1
+    return f"session#{next_session_number:05d}"
+
+# Read last session ID or generate new one
+last_session_id = get_last_session_id()
+if last_session_id:
+    session_id = last_session_id
+else:
+    session_id = "session#00001"  # Initial session ID
+
+# Initialize MPR121
+i2c = busio.I2C(board.SCL, board.SDA)
+mpr121 = adafruit_mpr121.MPR121(i2c)
+
+# Camera and other initializations
+picam2 = Picamera2()
+camera_config = picam2.create_still_configuration(main={"size": (1920, 1080)}, lores={"size": (1280, 720)}, display="lores")
+picam2.configure(camera_config)
+picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
+
+# Vertex APIs initialization 
+vertexai_url = 'https://asia-south1-hackathon-genai-08032024.cloudfunctions.net/vertexai_gen'
+alloydb_url = 'https://asia-south1-hackathon-genai-08032024.cloudfunctions.net/alloydb_connect'
+vertexai_ = VertexaiAccess(vertexai_url)
+db_access = AlloydbAccess(alloydb_url)
+
+TABLE_NAME = "learner_demo"
+
+image_captured = False
+
+index = AnnoyIndex(768, 'angular')  # Using angular distance
+
+def capture_image(image_path):
+    picam2.start()
+    picam2.capture_file(image_path)
+    print(f"Image captured and saved at: {image_path}")
+    image_captured = True
+
 def transcribe_audio(audio_file_path):
-    #client = speech.SpeechClient()
     client = speech.SpeechClient.from_service_account_file('test/key.json')
 
     with open(audio_file_path, "rb") as audio_file:
@@ -92,48 +129,63 @@ def record_audio(audio_file_path, record_seconds=10):
     wf.writeframes(b''.join(frames))
     wf.close()
 
-# Camera and MPR121 Initialization
-i2c = busio.I2C(board.SCL, board.SDA)
-mpr121 = adafruit_mpr121.MPR121(i2c)
-picam2 = Picamera2()
-camera_config = picam2.create_still_configuration(main={"size": (1920, 1080)}, lores={"size": (1280, 720)}, display="lores")
-picam2.configure(camera_config)
-picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
-
-# Function to capture image with unique ID
-def capture_image(image_path):
-    picam2.start()
-    picam2.capture_file(image_path)
-    print(f"Image captured and saved at: {image_path}")
-
-# Function to record video for 10 seconds
-def record_video():
-    video_path = f"/content/video_{int(time.time())}.h264"
-    picam2.start_recording(video_path)
-    time.sleep(10)
-    picam2.stop_recording()
-    print(f"Video recorded and saved at: {video_path}")
-
 # Main loop
 while True:
-    # Check for touched electrodes
     if mpr121[0].value:
         image_id = int(time.time())
         image_path = f"/content/Image_{image_id}.jpg"
         capture_image(image_path)
-        #call_llm_api(["Analyze this image"], image_path)
+        encoded_image = db_access.encode_image_to_base64(image_path)
+        response = vertexai_.send_query(["What is this image about?"], [image_path])
+        print(response)
+        embeds = vertexai_.generate_embeddings([response], task='RETRIEVAL_DOCUMENT')
+        print(db_access.update_table(TABLE_NAME, session_id, encoded_image, response , embeds[0]))
+
     elif mpr121[1].value:
-        #record_video()
-	    print("Video Recording is not available")
+        print("Video Recording is not available")
+
     elif mpr121[2].value:
-        # Record audio temporarily
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as audio_file:
             audio_file_path = audio_file.name
             record_audio(audio_file_path)
 
-        # Transcribe the audio
         text_input = transcribe_audio(audio_file_path)
+
         if text_input:
-            call_llm_api([text_input], image_path)  # Call LLM with transcribed text
+            stored_data = db_access.retrieve_session_data(session_id , TABLE_NAME)
+            embeds = stored_data["embedding"]
+
+            for i in range(len(embeds)):
+                embed = json.loads(embeds[i])
+                index.add_item(i, embed)
+            index.build(len(embeds) + 5)  # +5 trees 
+
+            query_embed = vertexai_.generate_embeddings([text_input], task='RETRIEVAL_QUERY')
+            data_index = index.get_nns_by_vector(query_embed[0], 2, include_distances=True)
+
+            data = "\n".join([stored_data["image_description"][index] for index in data_index[0] ])
+
+            print("Data Retrieve ", data)
+
+            prompt = f"Based on the context delimited in backticks, answer the query. ```{data}``` {text_input}"
+            response = vertexai_.send_query([prompt], [])
+
+            print("----------------------------------------------------------------------------------")
+
+            print("----------------------------------------------------------------------------------")
+
+            print("Response is: ")
+
+            print(response)
+
+
+            index = AnnoyIndex(768, 'angular')  # Using angular distance
+
+    elif mpr121[3].value:
+        # Generate new session ID
+        session_id = increment_session_id(session_id)
+        save_session_id(session_id)
+        print("New session ID:", session_id)
 
     time.sleep(0.1) # Adjust delay as needed
+
