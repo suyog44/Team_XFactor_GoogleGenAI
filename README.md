@@ -103,11 +103,11 @@ Operating within AlloyDB clusters, nodes act as virtual machine instances tasked
 
 Trinetra harnesses the power of Google's Vertex AI platform to leverage cutting-edge multimodal models, including Gemini and Gemma, for enhanced AI capabilities.
 
-**Gemini Models:**
+**Gemini Pro Model:**
 
 Gemini, available through Vertex AI, stands as Trinetra's cornerstone multimodal model, capable of comprehending various inputs and generating diverse outputs. This state-of-the-art model empowers Trinetra with advanced reasoning and generation capabilities, allowing developers to craft next-generation AI applications tailored to specific use cases.
 
-**Gemma Models:**
+**Gemma Pro Vision Model:**
 
 Complementing Gemini, Trinetra also offers access to Gemma models, which are lightweight and open models developed using the same research and technology utilized in the creation of Gemini models. These models further expand Trinetra's AI capabilities, providing developers with additional tools to address a wide range of applications and scenarios.
 
@@ -192,11 +192,12 @@ Trinetra isn't just limited to personalized learning. Explore its potential acro
 
 
 ### Video Tutorial : 
-Check out our prototype in action! [Insert link to prototype video]
+[Check out our prototype in action! ]
+https://www.youtube.com/watch?v=m40uDDo9G68
 
 ### Support : 
-For any inquiries or assistance, feel free to reach out to us at [email@example.com].
+For any inquiries or assistance, feel free to reach out to us at [suyogburadkar@gmail.com].
 
 ### Contributors
-1. XYZ
-2. XYZ
+1. Suyog Buradkar
+2. Pramod Geddam
