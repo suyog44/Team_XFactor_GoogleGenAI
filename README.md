@@ -116,7 +116,7 @@ By integrating Vertex AI and its suite of multimodal models, Trinetra enhances i
 ### Prototype : 
 Check out our prototype in action! 
 
-![Trinetra Prototype](assets/prototype_image.jpeg)
+![Trinetra Prototype](assets/prototype.png)
 
 ### High Level Architechture of RAG-capable generative AI application using Vertex AI
 
@@ -147,8 +147,8 @@ Through the orchestrated interplay of these interconnected components, Trinetra 
 
 Here is the working process flow diagram of Trinetra :
 
-![Trinetra Flow Diagram](assets/flowchart_diagram.jpeg)
-
+![Trinetra Flow Diagram1](assets/Flow_diagram.png)
+![Trinetra Flow Diagram2](assets/Flow_diagram_1.png)
 
 **(A) Input Acquisition:** The Trinetra device captures input in various forms such as audio, video, and images through its camera and audiophone functionalities.
 
