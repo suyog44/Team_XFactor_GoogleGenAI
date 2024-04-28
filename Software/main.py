@@ -15,6 +15,7 @@ from alloydb_access import AlloydbAccess
 from library.camera import Camera
 from library.audio import AudioRecorder
 from library.utils import get_last_session_id, save_session_id, increment_session_id
+from google.cloud import texttospeech
 
 
 SESSION_FILE_PATH = "/content/session.log"
@@ -38,6 +39,21 @@ def main():
     db_access = AlloydbAccess(alloydb_url)
 
     TABLE_NAME = "learner_demo"
+
+    # Text to Speech Setup
+    speech_gen_client = texttospeech.TextToSpeechClient()
+
+    # Note: the voice can also be specified by name.
+    # Names of voices can be retrieved with client.list_voices().
+    voice = texttospeech.VoiceSelectionParams(
+            language_code="en-US",
+            name="en-US-Studio-O",
+    )
+
+    audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.LINEAR16,
+            speaking_rate=1
+    )
 
     while True:
         if mpr121[0].value:
@@ -83,6 +99,15 @@ def main():
                 print("Response is: ")
 
                 print(response)
+
+                audio_response = speech_gen_client.synthesize_speech(
+                        request={"input": response, "voice": voice, "audio_config": audio_config}
+                )
+
+                # The response's audio_content is binary.
+                with open("output.mp3", "wb") as out:
+                    out.write(audio_response.audio_content)
+                    print('Audio content written to file "output.mp3"')
 
         elif mpr121[3].value:
             # Generate new session ID
