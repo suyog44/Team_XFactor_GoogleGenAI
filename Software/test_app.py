@@ -17,6 +17,7 @@ import wave
 import requests
 import json
 import base64
+import os
 
 from vertexai.vertexai_access import VertexaiAccess
 from vertexai.alloydb_access import AlloydbAccess
@@ -24,6 +25,9 @@ from vertexai.alloydb_access import AlloydbAccess
 from annoy import AnnoyIndex
 
 SESSION_FILE_PATH = "/content/session.log"
+
+def speak(text, speed=140):
+    os.system(f"espeak -s {speed} '{text}'")
 
 def get_last_session_id():
     try:
@@ -42,12 +46,17 @@ def increment_session_id(session_id):
     next_session_number = session_number + 1
     return f"session#{next_session_number:05d}"
 
+speak("Welcome to Trinetra - Your personal assistant")
 # Read last session ID or generate new one
 last_session_id = get_last_session_id()
 if last_session_id:
     session_id = last_session_id
 else:
     session_id = "session#00001"  # Initial session ID
+
+speak(session_id)
+# Print Active Session
+print("Session ID: {}", session_id)
 
 # Initialize MPR121
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -75,6 +84,7 @@ def capture_image(image_path):
     picam2.start()
     picam2.capture_file(image_path)
     print(f"Image captured and saved at: {image_path}")
+    speak("Image Saved successfully to Google Cloud")
     image_captured = True
 
 def transcribe_audio(audio_file_path):
@@ -140,6 +150,7 @@ while True:
         print(response)
         embeds = vertexai_.generate_embeddings([response], task='RETRIEVAL_DOCUMENT')
         print(db_access.update_table(TABLE_NAME, session_id, encoded_image, response , embeds[0]))
+        speak("Data stored in AlloyDB")
 
     elif mpr121[1].value:
         print("Video Recording is not available")
@@ -177,7 +188,7 @@ while True:
             print("Response is: ")
 
             print(response)
-
+            speak(response)
 
             index = AnnoyIndex(768, 'angular')  # Using angular distance
 
